@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="\mvc\static\css\list.css">
+    <!--引入jquery.js文件-->
+    <script src='http://cdn.bootcss.com/jquery/2.2.4/jquery.js'></script>
+    <!--引入插件.js文件-->
+    <script src='http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+    <!--引入插件.css文件-->
+    <link  href='http://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css' type='text/css' rel='stylesheet' />
+    <script>
+        $(document).ready(function(){
+        $('#p').click(function ()
+        {
+            alert('加入购物车成功');
+            window.location.href="http://localhost/mvc/index.php/ShoppingController/shopping";
+        });
+        });
+    </script>
+</head>
+<body>
+<!-- 头部 -->
+	<header class="header">
+		<div class="logo"></div>
+        <div class="nav">
+            <a href="http://localhost/mvc/index.php/FabuController/fabu" class="nav__item ">添加课程</a>
+            <a href="http://localhost/mvc/index.php/ListController/listt" class="nav__item nav__item_icon_new ">课程列表</i></a>
+            <a href="http://localhost/mvc/index.php/ShoppingController/shopping" class="nav__item">购物车</a>
+        </div>
+	</header>
+<div id="main">
+    <div class="wrap">
+        <!-- 节点筛选 -->
+        <div class="course-content">
+            <div class="course-nav-box">
+                <span class="hd">方向 ： </span>
+                <div class="bd">
+                    <ul>
+                        <li class="course-nav-item active">
+                            <a href="http://localhost/mvc/index.php/ListController/listt?zhonglei=Php">Php</a>
+                        </li>
+                        <li class="course-nav-item" id="test">
+                            <a href="http://localhost/mvc/index.php/ListController/listt?zhonglei=Java" onclick="">Java</a>
+                        </li>
+                        <li class="course-nav-item">
+                            <a href="http://localhost/mvc/index.php/ListController/listt?zhonglei=Html">Html/css</a>
+                        </li>
+                        <li class="course-nav-item">
+                            <a href="http://localhost/mvc/index.php/ListController/listt?zhonglei=Python">Python</a>
+                        </li>
+                        <li class="course-nav-item">
+                            <a href="http://localhost/mvc/index.php/ListController/listt?zhonglei=Android">Android</a>
+                        </li>
+                        <li class="course-nav-item">
+                            <a href="http://localhost/mvc/index.php/ListController/listt?zhonglei=Ios">Ios</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- 课程列表 -->
+<?php
+            while( $kechengxinxi = mysqli_fetch_array($_SESSION['kecheng']))
+           {
+?>
+    <div class="container" >
+        <div class="course-list" >
+            <div class="course-card-container">
+                <?php
+                $kechengmingzi = $kechengxinxi['name'];
+                echo "<a href='http://localhost/mvc/index.php/ShoppingController/shopping?kechengmingzi=".$kechengmingzi ."' id='p'>"
+                ?>
+                    <div class="course-card">
+                        <div class="course-card-top" >
+                            <span><?php echo $kechengxinxi['direction']; ?></span>
+                        </div>
+                        <div class="course-card-content" id="">
+                            <h3><?php echo $kechengxinxi['name']; ?></h3>
+                            <p><?php echo $kechengxinxi['jianjie']; ?></p>
+                            <div class="course-card-bottom">
+                                <span><?php echo $kechengxinxi['dengji']; ?></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-card-bk">
+                        <img src="./img/bk1.jpg" alt="">
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+    <?php
+          }
+          ?>
+</body>
+</html>
+

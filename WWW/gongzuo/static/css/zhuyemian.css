@@ -1,0 +1,154 @@
+#guanjianci{
+    background-color: aquamarine;
+}
+#zhu{
+    width: 1200px;
+
+}
+#logo{
+
+}
+#logo_left{
+    float: left;
+    width: 800px;
+    height: 80px;
+}
+#logo_right{
+    float:right ;
+    width: 400px;
+    height: 80px;
+    text-align: right;
+}
+
+#mulu{
+   float: left;
+    width: 1200px;
+}
+#mulu_zi{
+    text-align: center;
+    background-color: #d177ff;
+}
+#gonggao{
+    float: left;
+    width: 1200px;
+    background-color: aqua;
+}
+#biankuang{
+    float: left;
+    width: 1200px;
+}
+#biankuang_s{
+    float: left;
+    width: 250px;
+}
+#chanpin{
+    float: left;
+    width: 250px;
+    background-color: blanchedalmond;
+}
+#xinwen{
+    width: 250px;
+    float: left;
+    background-color: blanchedalmond;
+}
+#xinwen_k{
+    width: 250px;
+    float: left;
+    background-color: aqua;
+}
+#zixun{
+    float: left;
+    width: 250px;
+    background-color: blanchedalmond;
+}
+#zixun_k{
+    width: 250px;
+    float: left;
+    background-color: aqua;
+}
+
+#lianxi{
+    float: left;
+    width: 250px;
+    background-color: blanchedalmond;
+}
+#lianxi_k{
+    width: 250px;
+    float: left;
+    background-color: aqua;
+}
+#tu{
+    float: left;
+    width: 950px;
+}
+#jianjie{
+    float: left;
+    width: 950px;
+}
+#jianjie_k{
+    float: left;
+    width: 950px;
+    background-color: aqua;
+}
+#tuijian{
+    float: left;
+    width: 950px;
+    background-color: greenyellow;
+}
+#zhanshi{
+    float: left;
+    width: 950px;
+    background-color: greenyellow;
+}
+#foot{
+    float: left;
+    width: 1200px;
+    background-color: greenyellow;
+}
+#footbj{
+    text-align: center;
+}
+#jianjie_x
+{
+    float: left;
+    width: 950px;
+    background-color: chartreuse;
+}
+#xinwenkuang
+{
+    float: left;
+    width: 950px;
+    background-color: chartreuse;
+}
+
+#timu
+{
+    float: left;
+    width: 950px;
+}
+#qxinwen
+{
+    width: 950px;
+    float: left;
+    background-color: aqua;
+}
+#wenzhang
+{
+
+    width: 950px;
+    float: left;
+    background-color: aqua;
+
+}
+.tupian
+{
+    float: left;
+    width: 200px;
+    height: 200px;
+}
+#tupiankuang
+{
+    width: 950px;
+    float: left;
+
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看反馈</title>
+    <script>
+        function fanhui()
+        {
+            window.location.href='/gongzuo/index.php/controller/gkefu';
+        }
+    </script>
+</head>
+<body>
+<?php
+    foreach($fankui as $fankui)
+    {
+    ?>
+<table border="1" style="float: left">
+    <tr>
+        <td>问题编号</td>
+        <td><?php echo $fankui['id'];?></td>
+    </tr>
+
+    <tr>
+        <td>问题</td>
+        <td><?php echo $fankui['wenti'];?></td>
+    </tr>
+    <tr>
+        <td>内容</td>
+        <td><?php echo $fankui['neirong'];?></td>
+    </tr>
+    <tr>
+        <td>联系人</td>
+        <td><?php echo $fankui['lianxiren'];?></td>
+    </tr>
+    <tr>
+        <td>联系方式</td>
+        <td><?php echo $fankui['lianfangshi'];?></td>
+    </tr>
+
+</table>
+<?php
+    }
+    ?>
+<button onclick="fanhui();">返回</button>
+</body>
+</html>

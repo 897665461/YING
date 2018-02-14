@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>投票界面</title>
+    <script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js">
+    </script>
+    <script>
+    </script>
+</head>
+<body>
+<table>
+    <tr>
+        <td>编号</td>
+        <td>项目</td>
+        <td>票数</td>
+        <td>投票</td>
+    </tr>
+    <?php
+          for($i=0;$i<count($data);$i++)
+          {
+    ?>
+    <tr>
+        <td><a><?php echo $data[$i]['id'] ?></a></td>
+        <td><?php echo $data[$i]['xiangmu'] ?></td>
+        <td><?php echo $data[$i]['piaoshu'] ?></td>
+        <td><a href="/toupiao/index.php/denglucontroller/jieguochuli?id=<?php echo $data[$i]['id'] ?>">投票</a></td>
+    </tr>
+    <?php
+    }
+    ?>
+
+</table>
+</body>
+</html>

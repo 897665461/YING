@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加新闻</title>
+</head>
+<body>
+<form name="chanpin" action="/gongzuo/index.php/controller/shouchanpin" method="post" enctype="multipart/form-data">
+    产品标题：<input type="text" name="biaoti" required><br/>
+    产品来源：<input type="text" name="laiyuan" required><br/>
+    产品内容：<textarea cols="150" rows="30" name="neirong" required></textarea><br/>
+    关键字 ：<input type="text" name="guanjianzi" required><br/>
+    产品类别：<input type="text" name="leibie" required><br/>
+    <?php
+    $shuliang=$_GET['shuliang'];
+    for($i=0;$i<$shuliang;$i++){
+    ?>
+    图片上传：<input type="file" name="tupian[]"><br/>
+    <?php
+    }
+    ?>
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>

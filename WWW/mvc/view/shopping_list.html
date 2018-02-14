@@ -1,0 +1,189 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车</title>
+    <link rel="stylesheet" href="\mvc\static\css\shopcar.css">
+    <script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js">
+    </script>
+    <script>
+        function f()
+        {
+            $.get('/mvc/model/Jdead.php',{'1':'1'},function (date){
+            alert(date);
+            });
+        }
+            function c(r)
+            {
+                //订单总价的处理
+                q= "#s"+r;
+                meishangpinzongjia =$(q).val();
+
+                var zongyuanjia =  $("#qwe").text();
+
+                $("#qwe").text(Number(zongyuanjia)-Number(meishangpinzongjia));
+
+                $.get('/mvc/model/Jkesi.php',{'id':r,'zhiling':'shanchu'},function (date){
+
+                });
+                var o = ('#q'+r);
+                alert('删除成功');
+                $(o).remove();
+
+            }
+            function jiayi(a,jiage)
+            {
+
+                var b = document.getElementById(a).value;
+
+                b = Number(b)+1;
+
+                $.get('/mvc/model/Jkesi.php',{'id':a,'shuliang':b,'zhiling':'update'},function (date){
+                    alert(date);
+                });
+
+                document.getElementById(a).value=Number(b);
+
+
+                q='s'+a;                                           //单个商品的总价
+                var yuanjia =  document.getElementById(q).value;
+                document.getElementById(q).value=Number(yuanjia)+Number(jiage);
+
+                                                         //订单的总价？？？？
+                var zongyuanjia =  $("#qwe").text();
+                $("#qwe").text(Number(zongyuanjia)+Number(jiage));
+
+            }
+            function jianyi(a,jiage)
+            {
+
+                var b = document.getElementById(a).value;
+                if(b==1)
+                {
+                    alert('数量最少为1');
+                    return;
+                }
+
+                b = (Number(b)+(-1));
+
+                $.get('/mvc/model/Jkesi.php',{'id':a,'shuliang':b,'zhiling':'jianyi'},function (date){
+                    alert(date);
+                });
+                document.getElementById(a).value=Number(b);
+
+                q='s'+a;                                             //某项商品的总价
+                var yuanjia =  document.getElementById(q).value;
+                document.getElementById(q).value=Number(yuanjia)-Number(jiage);
+
+                w="'#ss'+a";                                         //订单的总价？？？？
+                var zongyuanjia =  $("#qwe").text();
+                $("#qwe").text(Number(zongyuanjia)-Number(jiage));
+            }
+    </script>
+</head>
+<body>
+<!-- header区域 -->
+<header class="header">
+    <div class="logo"></div>
+    <div class="nav">
+        <a href="http://localhost/mvc/index.php/FabuController/fabu" class="nav__item ">添加课程</a>
+        <a href="http://localhost/mvc/index.php/ListController/listt" class="nav__item nav__item_icon_new ">课程列表</i></a>
+        <a href="http://localhost/mvc/index.php/ShoppingController/shopping" class="nav__item">购物车</a>
+    </div>
+    <div class="profile">
+    </div>
+    <!--<div class="search">
+        <input type="text" class="search_input">
+        <a href="" class="search_submit"></a>
+    </div>-->
+</header>
+<!-- banner区域 -->
+<div class="banner">
+    <div>我的购物车</div>
+</div>
+
+<!-- goods区域 -->
+<div  style="max-width: 1104px;margin: -80px auto;box-shadow: 0 0px 8px rgba(7, 17, 27, 0.2);" id="cartBody">
+    <div class="cart-panel">
+        <div class="hd">
+            <ul class="order-title">
+                <li class="product">商品名称</li>
+                <li class="total-price">总价</li>
+                <li class="unit-price">单价</li>
+                <li class="number">数量</li>
+                <li class="operate">操作</li>
+            </ul>
+        </div>
+        <div class="bd">
+            <!-- 商品列表 -->
+            <?php
+                while($jieguo = mysqli_fetch_array($_SESSION['jieguo']))
+                {
+              ?>
+            <ul class="order-list" id="<?php echo 'q'.$jieguo['id']?>" >
+                <li><input type="checkbox" class="check" id="<?php echo 'c'.$jieguo['id']?>" checked></li>
+                <li class="img-box">
+                    <a href="http://www.imooc.com">
+                        <img src="\mvc\static\img\g1.jpg" alt="图片加载失败">
+                    </a>
+                </li>
+
+                <li class="product">
+                    <a href="http://www.imooc.com">
+                        <span><?php echo $jieguo['name']?></span>
+                    </a>
+                </li>
+                <li class="total-price">
+                    <div class="input-num">
+                        ¥<input   id="<?php echo 's'.$jieguo['id']?>" class="num" type="text" value="<?php echo ($jieguo['shuliang']* $jieguo['price'])?>" name="money">
+                        <?php  $sum=$sum+ ($jieguo['shuliang']* $jieguo['price'])?>
+                    </div>
+                </li>
+                <li class="unit-price">
+                    <span class="price-sign">¥</span>
+                    <span class="price-num"><?php echo $jieguo['price']?></span>
+                </li>
+                <li class="number">
+                    <div class="input-num">
+                        <a  href="javascript:jiayi('<?php echo $jieguo['id']?>','<?php echo $jieguo['price']?>')">+</a>
+
+                        <input id="<?php echo $jieguo['id']?>" type="text" value="<?php echo $jieguo['shuliang']?>" class="num">
+
+                        <a  href="javascript:jianyi('<?php echo $jieguo['id']; ?>','<?php echo $jieguo['price']?>')">-</a>
+                    </div>
+
+                </li>
+                <li class="operate"><a href="javascript:c('<?php echo $jieguo['id']; ?>')">删除</a></li>
+            </ul>
+            <?php
+                      if($kechengid)
+                      {
+                             $kechengid= $kechengid.",".$jieguo['id'];
+                      }
+                      else
+                      {
+                             $kechengid= $jieguo['id'];
+                       }
+
+                }
+
+               ?>
+
+    <!-- 结算栏 -->
+    <div class="pay-bar">
+        <div class="pay-info">
+
+            <div class="price">
+                <span class="price-sign">¥</span>
+                <span class="price-num pay-money"></span>
+            </div>
+
+            <span ><p id="qwe"><?php echo $sum; ?></p></span>
+            <span>应付金额：</span>
+        </div>
+        <button style="margin-right: -50px" onclick="javascript: f();"class="nav__item nav__item_icon_new"> 提交订单</button>
+</div>
+
+</body>
+</body>
+</html>

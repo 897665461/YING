@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注册</title>
+    <link href="style/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style/css/site.min.css" rel="stylesheet">
+    <script>
+        function c()
+        {
+            alert('跳转注册页面成功');
+            window.location.href="/student/index.php/zhucecontroller/zhuce";
+        }
+    </script>
+</head>
+<body>
+
+
+<form name="denglubiaotou" method="post" action="/student/index.php/zhucecontroller/dengluchuli">
+    登陆：<input name="xingming" type="text" required="required">
+    学号：<input name="xuehao" type="password" required="required">
+    <input type="submit" value="登陆">
+    <button onclick="c()">注册</button>
+
+</form>
+
+</body>
+</html>

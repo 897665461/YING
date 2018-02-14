@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件管理系统</title>
+    <script>
+        function xinjian()
+        {
+            document.getElementById('777').style.display="block";
+        }
+        function chong(i)
+        {
+            var id='111'+i;
+            document.getElementById(id).style.display="block";
+        }
+        function fu(i)
+        {
+            var id='222'+i;
+            document.getElementById(id).style.display="block";
+        }
+    </script>
+</head>
+<body>
+<table border="1">
+    <tr><td>当前路径<?php echo $dangqian; ?></td><td><a href="/wenjianxitong/index.php/controller/fanhui?lujing=<?php echo dirname($arrpath[0]); ?>">返回</a></td></tr>
+    <?php for($i=0;$i<count($arr);$i++)
+    {
+    ?>
+    <tr><td><?php echo $arr[$i] ?></td>
+        <?php require_once('model/model.php'); $size=0;$obj = new controller()?>
+        <td><?php echo $obj->daxiao($arrpath[$i]); ?></td>
+        <td><a href="http://localhost/wenjianxitong/index.php/Controller/open?wen=<?php echo $arrpath[$i] ?>">进入</a></td>
+        <td><button onclick="chong('<?php echo $i; ?>');">重命名</button></td>
+        <td><button onclick="fu('<?php echo $i; ?>') ">复制</button></td>
+        <td><button onclick="jian('<?php echo $i; ?>') ">剪切</button></td>
+        <td><a href="http://localhost/wenjianxitong/index.php/Controller/delete?wen=<?php echo $arrpath[$i] ?>">删除</a></td>
+    </tr>
+
+    <tr id="111<?php echo $i; ?>" style="display: none">
+        <td>
+            <form id="q" method="post" name="chongmingming" action="/wenjianxitong/index.php/Controller/chongmingming">
+                <input type="text" name="xinmingzi">
+                <input type="hidden" value="<?php echo dirname($arrpath[0]); ?>" name="dangqianlujing">
+                <input type="hidden" value="<?php echo $arr[$i]; ?>" name="jiumingzi">
+                <input type="submit" value="提交">
+            </form>
+        </td>
+    </tr>
+
+
+    <tr id="222<?php echo $i; ?>" style="display: none">
+        <td>
+            <form id="wy" method="post" name="fuzhi" action="/wenjianxitong/index.php/Controller/cop">
+                <input type="text" name="lujing">
+                <input type="hidden" value="<?php echo $arr[$i]; ?>" name="jiumingzi">
+                <input type="hidden" value="<?php echo dirname($arrpath[0]); ?>" name="dangqianlujing">
+                <input type="submit" value="提交">
+            </form>
+        </td>
+    </tr>
+
+    <tr id="333<?php echo $i; ?>" style="display: none">
+        <td>
+            <form id="w" method="post" name="jianqie" action="/wenjianxitong/index.php/Controller/cop">
+                <input type="text" name="lujing">
+                <input type="hidden" value="<?php echo $arr[$i]; ?>" name="jiumingzi">
+                <input type="hidden" value="<?php echo dirname($arrpath[0]); ?>" name="dangqianlujing">
+                <input type="submit" value="提交">
+            </form>
+        </td>
+    </tr>
+<?php
+    }
+    ?>
+</table>
+<button onclick="xinjian()" value="新建">新建文件夹</button>
+<table id="777" style="display:none ">
+    <tr>
+        <form action="/wenjianxitong/index.php/Controller/xinjian" name="xinjianbiaodan" method="post">
+            <td><input type="text"  name="xinwenjian"></td>
+            <td><input type="hidden" value="<?php echo $dangqian; ?>" name="dangqianlujing"></td>
+            <td><input type="submit" value="提交"></td>
+        </form>
+    </tr>
+</table>
+</body>
+</html>

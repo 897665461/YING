@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>网站管理</title>
+    <script>
+        function zhuce()
+        {
+            document.getElementById('zhuce').style.display='block';
+        }
+        function guanli()
+        {
+            window.location.href='/gongzuo/index.php/controller/gzhuyemian';
+        }
+    </script>
+</head>
+<body>
+<button onclick="zhuce();">新增管理</button>
+<button onclick="guanli();">管理网站</button>
+<div id="zhuce" style="display: none">
+    <form name="denglu" method="post" action="/gongzuo/index.php/controller/zhuce">
+        用户名：<input name="user" type="text" required><br/>
+        密 码：<input name="password" type="password" required><br/>
+        <input type="submit" value="注册">
+    </form>
+
+</div>
+</body>
+</html>

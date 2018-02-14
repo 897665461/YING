@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员功能</title>
+    <script>
+         function xuan(q)
+         {
+             for (i=0;i<q;i++)
+             {
+
+             document.getElementById(i).checked = "true";   //这里的i不能用任何分号引起来，不解析，而且第二项不能被选中，非常奇怪
+             }
+         }
+        function  xiao(q)
+         {
+             for (i=0;i<q;i++)
+             {
+
+                 document.getElementById(i).checked = "";   //这里的i不能用任何分号引起来，不解析，而且第二项不能被选中，非常奇怪
+             }
+         }
+    </script>
+</head>
+<body>
+<table>
+    <tr>
+        <td>编号</td>
+        <td>项目</td>
+        <td>票数</td>
+        <td>修改</td>
+    </tr>
+    <form name="biaodan" id="100" method="post" action="" >
+        <?php
+          for($i=0;$i<count($data);$i++)
+          {
+        ?>
+        <tr>
+            <td><input  id="<?php echo $i ?>" class="q" type="checkbox" name="fuxuankuang[]" value="<?php echo $data[$i]['id'] ?>"><?php echo $data[$i]['id'] ?></td>
+            <td><?php echo $data[$i]['xiangmu'] ?></td>
+            <td><?php echo $data[$i]['piaoshu'] ?></td>
+            <td><input type="button" onclick="location.href='/toupiao/index.php/denglucontroller/x?id=<?php echo $data[$i]["id"] ?>'" value="修改"></input></td>
+            <td><input type="button" onclick="location.href='/toupiao/index.php/denglucontroller/shanchuchuli?id=<?php echo $data[$i]["id"] ?>'" value="删除"></input></td>
+        </tr>
+        <?php
+        }
+       ?>
+    </form>
+    <tr>
+        <?php $cishu=count($data) ?>
+        <td><input type="button" value="选择全部" onclick="xuan(<?php echo $cishu ?>)"></td>
+        <td><input type="button" value="取消全部" onclick="xiao(<?php echo $cishu ?>)"></td>
+        <td><input type="button" value="删除全部" onclick="shan()"></td>
+    </tr>
+    <tr>
+        <form name="tianjia" method="post" action="/toupiao/index.php/denglucontroller/tianjia">
+        <td><input type="text" rel="10" name="xinxiangmu" required="required"></td>
+        <td><input type="submit" value="添加新项目"></td>
+        </form>
+        <td><a href="">退出管理</a></td>
+    </tr>
+</table>
+</body>
+</html>
