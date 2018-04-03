@@ -446,7 +446,7 @@ print_r($_SERVER['QUERY_STRING']);
     </script>
 </head>
 <body>
-<form name="wenjian" enctype="multipart/form-data" method="post" action="lianxi.php">
+<form name="wenjian" enctype="multipart/form-data" method="post" action="image.php">
     选择文件:<input type="file" name="wenjian">
     <input type="submit" value="提交">
 </form>

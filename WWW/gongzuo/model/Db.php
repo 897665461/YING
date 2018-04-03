@@ -23,7 +23,6 @@ class Db extends \PDO
         $stmt = self::$pdo->query("select password from user WHERE user=$user");
         $arr = $stmt->fetch(\PDO::FETCH_ASSOC);
         if($password==$arr['password']){
-
             return true;
         }else{
             return false;

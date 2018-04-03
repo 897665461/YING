@@ -1,9 +1,9 @@
 <?php
-namespace name;
-class factory
+class Factory
 {
-    static function gongchang()
+    static function shiyan()
     {
-        return new shiyanlei();
+        $shiyan = new shiyan();
+        return $shiyan;
     }
 }

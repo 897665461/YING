@@ -1,306 +1,457 @@
 <?php
 namespace app\index\controller;
-use think\Controller;                                                                                //很重要
+use app\index\model\My;
+use app\index\model\User;
 use app\index\model\Tiezi;
-use app\index\model\Biaoqian;
+use app\index\model\Tag;
+use app\index\model\Reply;
 use app\index\model\Zan;
-use app\index\model\Huifu;
+use think\Controller;
+use think\Request;
 use think\Db;
-use think\request;
 
 class Index extends Controller
 {
-    public function shiyan(Request $request)     //3这种方法也要引用命名空间
-    {
-        //$request = request();                    1
-        //$request = Request::instance();          2要引用·命名空间
-/*
-        dump($request->domain());                //域名
-        dump($request->pathinfo());              //模板 控制器 方法 迷惑代码
-        dump($request->path());                   //模板 控制器 方法
-        dump($request->method());                 //请求方式
-        dump($request->isget());                  //是否为get请求
-        dump($request->ispost());                  //还有post请求
-        dump($request->isajax());                  //还有这个请求
-        dump($request->get('id'));                //取得get请求的值
-        session('q','2');
-        dump($request->param());
-        dump($request->session());
-        dump($request->cookie());
-        dump($request->module());               //模板
-        dump($request->controller());           //控制器
-        dump($request->action());              //方法
-*/
-        $result = input('',100,'intval');    //第二位是默认值，第三位是过滤用的   本意是转为整型的意思
-        var_dump($result);
-    }
-    public function index()
-    {
-        //从luntan_tiezi取出数据
-        $res = Tiezi::select();
-
-        return $this->fetch('index',['res'=>$res]);
-
-    }
-
-    public function fenleizhanshi()                     //按照不同的类别展示帖子
-    {
-        $q = input();
-
-        if(!$q)                                         //默认情况为时间排序
-        {
-            $leibie = 'shijian';
-        }
-        else
-        {
-            $leibie = $q['leibie'];
-        }
-
-        $res = Tiezi::order($leibie)->select();
-
-
-        return $this->fetch('fenleizhanshi',['res'=>$res]);
-    }
-
-    public function zhuce()
+    public $user_id;
+    /*
+     * 跳转到注册页面
+     * */
+    public function zhuce( )
     {
         return $this->fetch();
     }
-
-    public function zhucechuli()
+    /*
+     * 接受密码
+     * 检验密码
+     * 存储密码
+     * */
+    public function zhuceshou(Request $response)
     {
-        if (request()->isPost())
+        $res = $response->post();
+        if(!$res)
         {
-            $zhucexinxi = input('post.');
+            return $this->success('信息错误');
         }
-        $username =  $this->request->post('username');
-        $password = $this->request->post('password');
-        $email = $this->request->post('email');
-
-        $user['xingming'] = $username;
-        $user['mima'] = md5(md5($password));
-        $user['youxiang'] = $email;
-        $user['isguanliyuan'] = 0;
-        $user['islahei'] = 0;
-        date_default_timezone_set("PRC");
-        $user['shijian'] = date("Y-m-d H:i:s");
-
-        Db::table('luntan_yonghu')->insert($user);
-
-        return $this->fetch('denglu');
+        extract($res);
+        date_default_timezone_set('PRC');
+        $ctime = date('Y-m-d H:i:s');
+        if($password!==$password1) {
+            echo "<script>alert('密码不相同,请重新输入。');window.location.href='/luntan/public/index.php/index/index/zhuce'</script>";
+        }else{
+            $user = new User();
+            $user->name = $name;
+            $user->email = $email;
+            $user->password = md5(md5(trim($password)));
+            $user->avatar = '';
+            $user->ctiime = $ctime;
+            $user->is_del = 0;
+            $user->is_admin = 0;
+            $user->save();
+            return $this->success('恭喜注册成功','index/index/denglu');    //非常nice
+        }
     }
+    /*
+     * 跳转到登陆页
+     * */
 
     public function denglu()
     {
         return $this->fetch();
     }
-
-    public function dengluchuli()
+    /*
+     * 验证登陆信息，成功则跳转到首页
+     * */
+    public function denglushou(Request $request)
     {
+        $res = $request->post();
 
-            $yonghuming = $this->request->post('yonghuming');
-            $mima = $this->request->post('mima');
+        $name= $res['name'];
+        $password1 = trim(md5(md5($res['password'])));
 
-            $jiamimima = md5(md5($mima));
-
-            $shuzu = Db::table('luntan_yonghu')->where('xingming', 'eq', $yonghuming)->select();//  要注意这个密码的传递   不然会传递未定义
-
-        if(isset($shuzu[0]['mima'])) {
-            if ($jiamimima == $shuzu[0]['mima']) {
-
-                session('yonghuming', $yonghuming);
-                return     $this->index();                                                            //返回的是方法还是view的视图   区分好     这里有错误
-
-            } else {
-                return $this->success("登录失败");
-            }
+        $result = User::naTopa($name);
+        $password2 = trim($result['password']);
+        if($result['is_del'])
+        {
+            $this->success('此号已被封印','index/index/denglu');
         }
-        else {
-            return $this->success("登录失败");
+        if($password1==$password2)
+        {
+            session('user_id',$result['id']);
+            session('user',$result['name']);
+            $this->success('登陆成功','index/index/shouye');
+        }else{
+            $this->success('密码错误，请重新登陆。','index/index/denglu');
         }
     }
-
-    public function tuichu()                                    //退出的逻辑处理
+    /*
+     * 跳转到首页
+     * */
+    public function shouye(Request $request)
     {
-        session('yonghuming',null);
-       return $this->index();
+        $this->assign('type','shouye');
+
+        //传递当前页的信息
+        $yema = empty($_GET['yema'])?1:$_GET['yema'];
+        $tiezi = new Tiezi();
+        $fenye = $tiezi->liebiao($yema);
+        $liebiao = array_shift($fenye);
+        $this->assign('liebiao',$liebiao);
+        $this->assign('fenye',$fenye);
+        $this->assign('user', session('user'));
+        //统计信息传递
+        $tiezisum = $tiezi->tiezisum();
+        $this->assign('tiezisum',$tiezisum);
+
+        $user = new User();
+        $usersum = $user->usersum();
+        $this->assign('usersum',$usersum);
+
+        $tag = new Tag();
+        $tagsum = $tag->tagsum();
+        $this->assign('tagsum',$tagsum);
+
+        $reply = new Reply();
+        $replysum = $reply->replysum();
+        $this->assign('replysum',$replysum);
+        //传递热门标签
+        $hot_tag = $tiezi->hottag();
+        $hot_tag_id =$hot_tag['id'];
+        $hot_tag_name =$tag->id_to_t( $hot_tag_id );
+        $this->assign('hot_tag_name',$hot_tag_name);
+        $this->assign('hot_tag_tiaoshu',$hot_tag['tiaoshu']);
+        //调用首页界面
+        return $this->fetch();
     }
-
-
-
-    public function chuli()
+    /*
+     * 按照赞的排序来显示首页页面
+     * */
+    public function zan()
     {
-        $username = $this->request->get('xingming');//接收信息
+        //传递列表信息
+        $yema = empty($_GET['yema'])?1:$_GET['yema'];
+        $tiezi = new Tiezi();
+        $fenye = $tiezi->zanfenye($yema);
+        $liebiao = array_shift($fenye);
+        $this->assign('liebiao',$liebiao);
+        $this->assign('fenye',$fenye);
+        $this->assign('user', session('user'));
+        $this->assign('type','zan');
+        //统计信息传递
+        $tiezisum = $tiezi->tiezisum();
+        $this->assign('tiezisum',$tiezisum);
 
-        $q = ['q'=>$username];                      //构建数组
-        Db::table('shiyan_er')->insert($q);       //传递
-        //确实很方便
-        //Db::execute('insert  into shiyan_er(q) VALUES (:u)',['u'=>$username]);
-        //Db::execute('insert shiyan_er(q) values(:username)',['username'=>$username]);
+        $user = new User();
+        $usersum = $user->usersum();
+        $this->assign('usersum',$usersum);
 
+        $tag = new Tag();
+        $tagsum = $tag->tagsum();
+        $this->assign('tagsum',$tagsum);
+
+        $reply = new Reply();
+        $replysum = $reply->replysum();
+        $this->assign('replysum',$replysum);
+        //传递热门标签
+        $hot_tag = $tiezi->hottag();
+        $hot_tag_id =$hot_tag['id'];
+        $hot_tag_name =$tag->id_to_t( $hot_tag_id );
+        $this->assign('hot_tag_name',$hot_tag_name);
+        $this->assign('hot_tag_tiaoshu',$hot_tag['tiaoshu']);
+        //调用首页界面
+        return $this->fetch('shouye');
     }
+    /*
+     * 按照回复的数量的排序来显示首页页面
+     * */
+    public function hui()
+    {
+        $this->assign('type','hui');
+
+        $yema = empty($_GET['yema'])?1:$_GET['yema'];
+        $tiezi = new Tiezi();
+        $fenye = $tiezi->huifenye($yema);
+        $liebiao = array_shift($fenye);
+        $this->assign('liebiao',$liebiao);
+        $this->assign('fenye',$fenye);
+        $this->assign('user', session('user'));
+        //统计信息传递
+        $tiezisum = $tiezi->tiezisum();
+        $this->assign('tiezisum',$tiezisum);
+
+        $user = new User();
+        $usersum = $user->usersum();
+        $this->assign('usersum',$usersum);
+
+        $tag = new Tag();
+        $tagsum = $tag->tagsum();
+        $this->assign('tagsum',$tagsum);
+
+        $reply = new Reply();
+        $replysum = $reply->replysum();
+        $this->assign('replysum',$replysum);
+        //传递热门标签
+        $hot_tag = $tiezi->hottag();
+        $hot_tag_id =$hot_tag['id'];
+        $hot_tag_name =$tag->id_to_t( $hot_tag_id );
+        $this->assign('hot_tag_name',$hot_tag_name);
+        $this->assign('hot_tag_tiaoshu',$hot_tag['tiaoshu']);
+        //调用首页界面
+        return $this->fetch('shouye');
+    }
+    /*
+     * 我的回复的界面
+     * */
+    public function myhui()
+    {
+        $this->assign('type','hui');
+
+        $yema = empty($_GET['yema'])?1:$_GET['yema'];
+        $tiezi = new Tiezi();
+        $user_id = session('user_id');
+        $fenye = $tiezi->myreply($yema,$user_id);
+        $liebiao = array_shift($fenye);
+        $this->assign('liebiao',$liebiao);
+        $this->assign('fenye',$fenye);
+        $this->assign('user', session('user'));
+        //统计信息传递
+        $tiezisum = $tiezi->tiezisum();
+        $this->assign('tiezisum',$tiezisum);
+
+        $user = new User();
+        $usersum = $user->usersum();
+        $this->assign('usersum',$usersum);
+
+        $tag = new Tag();
+        $tagsum = $tag->tagsum();
+        $this->assign('tagsum',$tagsum);
+
+        $reply = new Reply();
+        $replysum = $reply->replysum();
+        $this->assign('replysum',$replysum);
+        //传递热门标签
+        $hot_tag = $tiezi->hottag();
+        $hot_tag_id =$hot_tag['id'];
+        $hot_tag_name =$tag->id_to_t( $hot_tag_id );
+        $this->assign('hot_tag_name',$hot_tag_name);
+        $this->assign('hot_tag_tiaoshu',$hot_tag['tiaoshu']);
+        //调用首页界面
+        return $this->fetch('shouye');
+    }
+    /*
+     * 跳转到帖子的详情界面
+     * */
+    public function post(Request $request)
+    {
+        //通过id直接返回，还是通过搜索返回
+        if($request->get('title')){
+            $title = $request->get('title');
+            $tiezi = new Tiezi();
+            $id = $tiezi->tiToid($title);
+        }else{
+            $id = $request->get('id');
+        }
+        //传递当前帖子信息
+        $tiezi = new Tiezi();
+        $tiezi->yuedu($id);//增加阅读的次数
+        $yuedutime =  $tiezi->yuetime($id);//阅读次数的传递
+
+        $this->assign('yuedutime',$yuedutime);
+        $xiangqing = $tiezi->xiangqing($id);
+        if($xiangqing[0]['is_del']==1)
+        {
+            $this->success('此贴已被封印','index/index/shouye');
+        }
+        $this->assign('xiangqing',$xiangqing[0]);
+
+        $tag = new Tag();
+        $biaoqian = $tag->ttag($xiangqing['0']['tag_id']);
+        $this->assign('biaoqian',$biaoqian['0']['name']);
+
+        $reply = new Reply();
+        $replybiao = $reply->replybiao($id);
+        $replysum = count($replybiao);
+        $this->assign('replysum',$replysum);
+        $this->assign('replybiao',$replybiao);
+        $this->assign('user',session('user'));
+        //统计信息传递
+        $tiezisum = $tiezi->tiezisum();
+        $this->assign('tiezisum',$tiezisum);
+
+        $user = new User();
+        $usersum = $user->usersum();
+        $this->assign('usersum',$usersum);
+
+        $tag = new Tag();
+        $tagsum = $tag->tagsum();
+        $this->assign('tagsum',$tagsum);
+
+        $reply = new Reply();
+        $replysum = $reply->replysum();
+        $this->assign('replysum',$replysum);
+        //传递热门标签
+        $hot_tag = $tiezi->hottag();
+        $hot_tag_id =$hot_tag['id'];
+        $hot_tag_name =$tag->id_to_t( $hot_tag_id );
+        $this->assign('hot_tag_name',$hot_tag_name);
+        $this->assign('hot_tag_tiaoshu',$hot_tag['tiaoshu']);
+        //回复总数
+        $tie_reply_sum = $reply->tie_reply_sum($id);
+        $this->assign('tie_reply_sum',$tie_reply_sum);
+        //赞的信息
+        $zan = new Zan();
+        $zanshu = $zan->quzan($id);
+        $this->assign('zanshu',$zanshu);
+        //已回复标志修改
+        if(session('user_id')==$xiangqing[0]['zuozhe_id']) {
+            $reply->yihuifu($id);
+        }
+        //调用帖子详情页面
+        return $this->fetch();
+    }
+    /*
+     * 跳转到发帖页面
+     * */
     public function fatie()
     {
-       return $this->fetch();                           //不要忘了return
+        $tag = new Tag();
+        $tag = $tag->tag();
+        $this->assign('user', session('user'));
+        $this->assign('tag',$tag);
+        return $this->fetch();
     }
-
-
-    public function fatiechuli()
+    /*
+     * 从相应的数据库中取出相应信息
+     * 再将帖子的信息保存到数据库
+     * */
+    public function shoutie(Request $request)
     {
-        if(request()->ispost())                         //检查有没有传过来信息
-        {
-             $postData = input('post.');
+        extract($request->post());
+        $tiezi = new Tiezi();
+        $tiezi->title = $title ;
+        $tiezi->content = $content;
+        $tiezi->user_id= session('user_id');
+        $tiezi->category_id= $category;
+        list($weimiao,$time) = explode(' ',microtime());
+        $tiezi->create_at = $time+$weimiao;
+        $tiezi->is_del =  0;
+        $tiezi->tag_id = $tag;
 
+        $tiezi->save();
+        $this->success('发帖成功','index/index/fatie');
+    }
+    /*
+     * 退出
+     * 即删除session，跳转到登陆界面
+     * */
+    public function tuichu()
+    {
+        $user = session('user',null);//第二个参数不能为'',否则和session('user')是一样的
+        return $this->fetch('denglu');
+    }
+    /*
+     * 跳转到我的主页
+     * */
+    public function my()
+    {
 
-            $biaoti = $postData["biaoti"];             //数据传递
-            $zuozhe = session('yonghuming');
-            $neirong = $postData['neirong'];
-            $leibie =   $postData['jiedian'];
-            date_default_timezone_set("PRC");
-            $shijian = date("Y-m-d H:i:s");
-            $isshan ='no';
-            $biaoqian = $postData['biaoqian'];
+        $user_id = session('user_id');
 
-            $res = Tiezi::create([                        //将帖子数据存入数据库中相应表
-                'biaoti'=>$biaoti,
-                'zuozhe'=>$zuozhe,
-                'neirong'=>$neirong,
-                'leibie' =>$leibie,
-                'shijian'=>$shijian,
-                'isshan'=>$isshan,
-                ]);
+        $my = new My();
+        $image = $my->qu(session('user_id'));
+        $this->assign('image',$image);
 
-            //1。从数据库中取出文章id
+        $xmy = $my->quchu($user_id);
+        $this->assign('xmy',$xmy);
 
-            $id = Tiezi::where('neirong','=', $neirong)->find();
-            $id = $id->toArray();
-            $id = $id['id'];
+        $this->assign('user',session('user'));
+        $this->assign('user_id',session('user_id'));
 
-            $resq = Biaoqian::create([
-                'wenzhang'=>$id,                          //将标签相关的数据存入标签表
-                'biaoqian'=>$biaoqian
-            ]);
+        return $this->fetch();
+    }
+    public function shoumy(Request $request)
+    {
+        var_dump($request->post());
+    }
+    /*
+     * 转到头像界面
+     * */
+    public function avatar()
+    {
+        $my = new My();
+        $image = $my->qu(session('user_id'));
+        $this->assign('image',$image);
 
-            if($res and $resq)
-            {
-                 return $this->index();                   //要写成这个样子， fetch（）是调用的模板，这才是调用的方法
+        $this->assign('user',session('user'));
+        $this->assign('user_id',session('user_id'));
+        return $this->fetch();
+    }
+    /*
+     * 跳转到修改密码界面
+     * */
+    public function password()
+    {
+        $my = new My();
+        $image = $my->qu(session('user_id'));
+        $this->assign('image',$image);
+
+        $this->assign('user',session('user'));
+        $this->assign('user_id',session('user_id'));
+        return $this->fetch();
+    }
+    /*
+     * 修改数据库中的密码
+     * */
+    public function shoupassword(Request $request)
+    {
+        $result = $request->post();
+        $name = session('user');
+        $res =  User::naTopa($name);
+        $password = $res['password'];
+        if($result['password1']==$result['password2']){
+            if($password==md5(md5($result['password0']))){
+                $user = new User();
+                $user->updatepa($name,md5(md5($result['password1'])));
+                $this->success('修改成功','index/index/Password');
+            }else{
+                $this->success('密码错误');
             }
-            else
-            {
-                $this->error('发帖失败');
-            }
+
+        }else{
+            $this->success('密码不一致，请重新输入。');
         }
-        else
-        {
-            $this->error('发帖失败');
-        }
+
     }
-    public function xiangqing()                                                   //帖子详情的展示
+    /*
+     *跳转到通知页面
+     * */
+    public function message()
     {
-       $id = input();
 
-        $id =  $id['id'];                                                         //接收帖子文章的id  {:url}传递参数要用数组的形式并且放在括号里
-
-        $result = Tiezi::where('id','=',$id)->find();                              //取出帖子的信息    注意这里的id的引号问题
-        $result = $result->toArray();
-        $wid = $result['id'];                                                      //传递文章的id
-
-        $biaoqian = Biaoqian::where('wenzhang','=',"$wid")->find();              //取出文章id对应的标签
-
-        $biaoqian =$biaoqian->toArray();
-
-        $huifuxinxi = Huifu::where('wenzhang_id','=',$id)->select();            //回复信息的获取
-        $huifuzongshu =Huifu::where('wenzhang_id','=',$id)->count();
-
-        $zan = Zan::where('zanwenzhang','=',$id)->count();                        //获取赞的数量
-
-        return $this->fetch('xiangqing',['result'=>$result,'biaoqian'=>$biaoqian,'huifuxinxi'=>$huifuxinxi,'huifuzongshu'=>$huifuzongshu,
-                                             'zan'=>$zan]);
+        $this->assign('user',session('user'));
+        return $this->fetch();
     }
-
-
-    public function dianzan()                                                 //点赞的数据上传到数据库
+    /*
+     * 转到帖子积分界面
+     * */
+    public function score()
     {
-        $dianzanren = session('yonghuming');
-
-        if(!$dianzanren)
-        {
-            return "<script>alert('请登陆')</script>";
-        }
-
-        //时间
-        $shijian = date("Y-m-d H:i:s");
-
-        //传递文章id
-
-        $wid = input();
-        $wid =$wid['id'];                                       //为什么每点一下会存入两条数据，刷新也会存入两条数据
-        //检查数据库有没有此用户对此文章的点赞
-
-        //存入数据库
-        $shuzu = [
-            'id'=>'',
-            'dianzanzhe'=>$dianzanren,
-            'zanwenzhang'=>$wid,
-            'shijian'=>$shijian
-        ];
-       Zan::create($shuzu);
-
-       // $this->assign('id',$wid);
-        return $this->xiangqing() ;                          //传递文章id使文章可以返回原来的界面
-
+        $this->assign('user',session('user'));
+        return $this->fetch();
     }
-
-    public function diancai()
+    /*
+     * 转到帖子主题界面
+     * */
+    public function tag()
     {
-        $dianzanren = session('yonghuming');
-
-        if(!$dianzanren)
-        {
-            return "<script>alert('请登陆')</script>";
-        }
-        $dianzanren = session('yonghuming');
-        var_dump($dianzanren);
-        if(!$dianzanren)
-        {
-            return "<script>alert('请登陆')</script>";
-        }
-
+        $this->assign('user',session('user'));
+        return $this->fetch();
     }
-
-
-    public function huifu()                                   //回帖信息上传到数据库
+    /*
+     * 转到帖子话题界面
+     * */
+    public function thread()
     {
-        $dianzanren = session('yonghuming');
-
-        if(!$dianzanren)
-        {
-            return "<script>alert('请登陆')</script>";
-        }
-
-        $q = input();                                        //用input助手函数接受传过来的全部信息
-        $hufuneirong = input('post.neirong');
-        $huifuzhe_id = session('yonghuming');
-        $shijian = date('Y-m-d H:i:s');                    //获取当前的时间，要设置一下当前位置的时区
-        $jieshouzhe = 0;
-        $wenzhangid =$q['id'];
-
-        $shuzu= [
-            'id'=>'',
-            'neirong'=>$hufuneirong,
-            'shijian'=>$shijian,
-            'jieshouzhe'=>$jieshouzhe,
-            'wenzhang_id'=>$wenzhangid,
-            'huifuzhe_id'=>$huifuzhe_id
-        ];
-        Huifu::create($shuzu);                              //存入相应的数据库
-
-        return $this->xiangqing();                        //这个方法对应的页面传递的id  一定要和xiangqing方法的参数名一致，这样可以返回相同文章对应的界面，很方便
-
+        $this->assign('user',session('user'));
+        return $this->fetch();
     }
-
-
-
-
-
 }

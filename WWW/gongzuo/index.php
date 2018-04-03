@@ -2,6 +2,7 @@
 define('ROOT',pathinfo(__FILE__,PATHINFO_DIRNAME));//定义入口文件路径
 
 spl_autoload_register('auto_load');
+
 function auto_load($class){
     require_once ROOT.'\\'.$class.'.php';
 }

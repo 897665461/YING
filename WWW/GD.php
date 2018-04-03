@@ -1,7 +1,7 @@
 <?php
 //$image = 'gongzuo/wenjian/link.jpg';
 //$data = getimagesize($image);
-/*
+
 $im = imagecreatetruecolor(600,600);
 $back = imagecolorallocate($im,30,40,5);
 imagefill($im,0,0,$back);
@@ -11,22 +11,22 @@ imagestring($im,5,0,0,'7774',$col);
 
 header('content-type:image/png');
 imagepng($im);
-*/
 
-/*
+
+
 $im = imagecreatefromjpeg($image);
 $c = imagecolorallocate($im,rand(0,200),rand(0,200),rand(0,200));
 imagejpeg($im);
 $a = imagerotate($im,90,$c);
 imagejpeg($a);
 imagejpeg($im);
-*/
 
-/*
+
+
 header('content-type:image/jpeg');
 $im = imagecreatefromjpeg($image);
 imagejpeg($im);
-*/
+
 
 /*
 $im = imagecreatetruecolor(400,400);

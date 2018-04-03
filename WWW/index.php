@@ -1,13 +1,9 @@
 <?php
-$curl = curl_init("https://daohang.qq.com/?fr=hmpage");
-curl_exec($curl);
-var_dump($curl);
-curl_close($curl);
 
+$redis = new Redis();
 
+$redis->connect('127.0.0.1',6379);
+$redis->select(1);
+$redis->set('string','hello redis');
 
-
-
-
-
-?>
+echo $redis->get('string');
